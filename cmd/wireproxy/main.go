@@ -263,7 +263,16 @@ func main() {
 
 	if *info != "" {
 		go func() {
-			err := http.ListenAndServe(*info, tun)
+			listener, err := net.Listen("tcp", *info)
+
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Printf("{\"infoAddr\": \"%s\"}\n", listener.Addr().String())
+
+			err = http.Serve(listener, tun)
+
 			if err != nil {
 				panic(err)
 			}

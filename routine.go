@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"math/rand"
@@ -175,7 +176,17 @@ func (config *Socks5Config) SpawnRoutine(vt *VirtualTun) {
 
 	server := socks5.NewServer(options...)
 
-	if err := server.ListenAndServe("tcp", config.BindAddress); err != nil {
+	listener, err := net.Listen("tcp", config.BindAddress)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	fmt.Printf("{\"socks5Addr\": \"%s\"}\n", listener.Addr().String())
+	err = server.Serve(listener)
+
+	if err != nil {
 		log.Fatal(err)
 	}
 }
