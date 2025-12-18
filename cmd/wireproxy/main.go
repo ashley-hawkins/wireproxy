@@ -238,7 +238,9 @@ func main() {
 	// Wireguard doesn't allow configuring which FD to use for logging
 	// https://github.com/WireGuard/wireguard-go/blob/master/device/logger.go#L39
 	// so redirect STDOUT to STDERR, we don't want to print anything to STDOUT anyways
+	originalStdout := os.Stdout
 	os.Stdout = os.Stderr
+
 	logLevel := device.LogLevelVerbose
 	if *silent {
 		logLevel = device.LogLevelSilent
@@ -250,6 +252,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	os.Stdout = originalStdout
 
 	for _, spawner := range conf.Routines {
 		go spawner.SpawnRoutine(tun)
